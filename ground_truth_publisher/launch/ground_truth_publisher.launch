@@ -1,0 +1,8 @@
+<launch>
+
+    <node name="ground_truth_publisher" pkg="ground_truth_publisher" type="ground_truth_publisher" output="screen">
+        
+        <remap from="~mocap_pose" to="/vicon/firefly_sbx/firefly_sbx" />
+    </node>
+
+</launch>
