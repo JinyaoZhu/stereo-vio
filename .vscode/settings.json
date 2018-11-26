@@ -2,5 +2,9 @@
     "files.associations": {
         "*.ipp": "cpp",
         "core": "cpp"
-    }
+    },
+    "python.autoComplete.extraPaths": [
+        "/home/jinyao/ros_ws/stereo-vio/devel/lib/python2.7/dist-packages",
+        "/opt/ros/kinetic/lib/python2.7/dist-packages"
+    ]
 }
