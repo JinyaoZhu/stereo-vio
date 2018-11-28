@@ -210,7 +210,7 @@ void ImageProcessor::stereoCallback(
     const sensor_msgs::ImageConstPtr& cam0_img,
     const sensor_msgs::ImageConstPtr& cam1_img) {
 
-  //cout << "==================================" << endl;
+  cout << "==================================" << endl;
 
   // Get the current image.
   cam0_curr_img_ptr = cv_bridge::toCvShare(cam0_img,
@@ -235,28 +235,32 @@ void ImageProcessor::stereoCallback(
     //ROS_INFO("Draw features: %f",
     //    (ros::Time::now()-start_time).toSec());
   } else {
+    ros::Time img_process_time = ros::Time::now();
     // Track the feature in the previous image.
     ros::Time start_time = ros::Time::now();
     trackFeatures();
-    //ROS_INFO("Tracking time: %f",
+    // ROS_INFO("Tracking time: %f",
     //    (ros::Time::now()-start_time).toSec());
 
     // Add new features into the current image.
     start_time = ros::Time::now();
     addNewFeatures();
-    //ROS_INFO("Addition time: %f",
+    // ROS_INFO("Addition time: %f",
     //    (ros::Time::now()-start_time).toSec());
 
     // Add new features into the current image.
     start_time = ros::Time::now();
     pruneGridFeatures();
-    //ROS_INFO("Prune grid features: %f",
+    // ROS_INFO("Prune grid features: %f",
     //    (ros::Time::now()-start_time).toSec());
+
+    ROS_INFO("Image-Processing time: %f",
+      (ros::Time::now()-img_process_time).toSec());
 
     // Draw results.
     start_time = ros::Time::now();
     drawFeaturesStereo();
-    //ROS_INFO("Draw features: %f",
+    // ROS_INFO("Draw features: %f",
     //    (ros::Time::now()-start_time).toSec());
   }
 
@@ -1000,7 +1004,7 @@ void ImageProcessor::twoPointRansac(
 
   double norm_pixel_unit = 2.0 / (intrinsics[0]+intrinsics[1]);
   int iter_num = static_cast<int>(
-      ceil(log(1-success_probability) / log(1-0.7*0.7)));
+      ceil(log(1-success_probability) / log(1-0.6*0.6)));
 
   // Initially, mark all points as inliers.
   inlier_markers.clear();
