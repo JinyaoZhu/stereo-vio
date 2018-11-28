@@ -20,7 +20,7 @@
       <rosparam command="load" file="$(arg calibration_file)"/>
 
       <param name="publish_tf" value="true"/>
-      <param name="frame_rate" value="20"/>
+      <param name="frame_rate" value="30"/>
       <param name="fixed_frame_id" value="$(arg fixed_frame_id)"/>
       <param name="child_frame_id" value="odom"/>
       <param name="max_cam_state_size" value="15"/>
@@ -59,7 +59,7 @@
     </node>
   </group>
 
-  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find msckf_vio)/rviz/rviz_euroc_config.rviz" />
+  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find msckf_vio)/rviz/rviz_mynteye_config.rviz" />
 
   <include file="$(find mynt_eye_ros_wrapper)/launch/mynteye.launch">
   </include>
