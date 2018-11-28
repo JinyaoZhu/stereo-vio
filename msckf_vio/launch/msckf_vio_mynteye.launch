@@ -23,11 +23,11 @@
       <param name="frame_rate" value="30"/>
       <param name="fixed_frame_id" value="$(arg fixed_frame_id)"/>
       <param name="child_frame_id" value="odom"/>
-      <param name="max_cam_state_size" value="15"/>
+      <param name="max_cam_state_size" value="10"/>
       <param name="position_std_threshold" value="8.0"/>
 
       <param name="rotation_threshold" value="0.2618"/>
-      <param name="translation_threshold" value="0.3"/>
+      <param name="translation_threshold" value="0.2"/>
       <param name="tracking_rate_threshold" value="0.5"/>
 
       <!-- Feature optimization config -->
