@@ -210,7 +210,9 @@ void ImageProcessor::stereoCallback(
     const sensor_msgs::ImageConstPtr& cam0_img,
     const sensor_msgs::ImageConstPtr& cam1_img) {
 
-  cout << "==================================" << endl;
+  static double img_process_time_cost = 0.01;
+
+  // cout << "==================================" << endl;
 
   // Get the current image.
   cam0_curr_img_ptr = cv_bridge::toCvShare(cam0_img,
@@ -254,8 +256,9 @@ void ImageProcessor::stereoCallback(
     // ROS_INFO("Prune grid features: %f",
     //    (ros::Time::now()-start_time).toSec());
 
-    ROS_INFO("Image-Processing time: %f",
-      (ros::Time::now()-img_process_time).toSec());
+    img_process_time_cost = 0.99*img_process_time_cost +
+                            0.01*(ros::Time::now()-img_process_time).toSec();    
+    ROS_INFO_THROTTLE(0.5,"Image-Processing avg. time: %.2f[ms]", 1000*img_process_time_cost);
 
     // Draw results.
     start_time = ros::Time::now();
@@ -595,10 +598,10 @@ void ImageProcessor::trackFeatures() {
     curr_feature_num += item.second.size();
 
   ROS_INFO_THROTTLE(0.5,
-      "\033[0;32m candidates: %d; track: %d; match: %d; ransac: %d/%d=%f\033[0m",
+      "\033[0;32m candidates: %d; track: %d; match: %d; ransac: %d/%d=%.1f%%\033[0m",
       before_tracking, after_tracking, after_matching,
       curr_feature_num, prev_feature_num,
-      static_cast<double>(curr_feature_num)/
+      100.0*static_cast<double>(curr_feature_num)/
       (static_cast<double>(prev_feature_num)+1e-5));
   //printf(
   //    "\033[0;32m candidates: %d; raw track: %d; stereo match: %d; ransac: %d/%d=%f\033[0m\n",
@@ -711,8 +714,8 @@ void ImageProcessor::addNewFeatures() {
       const int y = static_cast<int>(feature.cam0_point.y);
       const int x = static_cast<int>(feature.cam0_point.x);
 
-      int up_lim = y-2, bottom_lim = y+3,
-          left_lim = x-2, right_lim = x+3;
+      int up_lim = y-3, bottom_lim = y+3,
+          left_lim = x-3, right_lim = x+3;
       if (up_lim < 0) up_lim = 0;
       if (bottom_lim > curr_img.rows) bottom_lim = curr_img.rows;
       if (left_lim < 0) left_lim = 0;
