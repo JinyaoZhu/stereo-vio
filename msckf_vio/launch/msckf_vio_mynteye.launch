@@ -1,8 +1,14 @@
 <launch>
 
-  <arg name="robot" default="my_robot"/>
+  <arg name="robot" default="jinyaos_vio"/>
   <arg name="fixed_frame_id" default="world"/>
   <arg name="calibration_file" default="$(find msckf_vio)/config/camchain-imucam-mynteye.yaml"/>
+
+  <!-- VI-Sensor parameters -->
+  <!-- frame_rate range: {10,15,20,25,30,35,40,45,50,55,60} -->
+  <arg name="frame_rate" default="20" />
+  <!-- imu_frequency range: {100,200,250,333,500} -->
+  <arg name="imu_frequency" default="250" />
 
   <!-- Image Processor Nodelet  -->
   <include file="$(find msckf_vio)/launch/image_processor_mynteye.launch">
@@ -20,11 +26,11 @@
       <rosparam command="load" file="$(arg calibration_file)"/>
 
       <param name="publish_tf" value="true"/>
-      <param name="frame_rate" value="30"/>
+      <param name="frame_rate" value="$(arg frame_rate)"/>
       <param name="fixed_frame_id" value="$(arg fixed_frame_id)"/>
       <param name="child_frame_id" value="odom"/>
-      <param name="max_cam_state_size" value="10"/>
-      <param name="position_std_threshold" value="8.0"/>
+      <param name="max_cam_state_size" value="15"/>
+      <param name="position_std_threshold" value="3.0"/>
 
       <param name="rotation_threshold" value="0.2618"/>
       <param name="translation_threshold" value="0.2"/>
@@ -34,7 +40,7 @@
       <param name="feature/config/translation_threshold" value="-1.0"/>
 
       <!-- These values should be standard deviation -->
-      <param name="noise/gyro" value="0.0013"/>
+      <param name="noise/gyro" value="0.005"/>
       <param name="noise/acc" value="0.05"/>
       <param name="noise/gyro_bias" value="0.001"/>
       <param name="noise/acc_bias" value="0.01"/>
@@ -45,11 +51,11 @@
       <param name="initial_state/velocity/z" value="0.0"/>
 
       <!-- These values should be covariance -->
-      <param name="initial_covariance/velocity" value="0.25"/>
-      <param name="initial_covariance/gyro_bias" value="0.05"/>
-      <param name="initial_covariance/acc_bias" value="0.05"/>
-      <param name="initial_covariance/extrinsic_rotation_cov" value="3.0462e-4"/>
-      <param name="initial_covariance/extrinsic_translation_cov" value="2.5e-5"/>
+      <param name="initial_covariance/velocity" value="0.5"/>
+      <param name="initial_covariance/gyro_bias" value="0.3"/>
+      <param name="initial_covariance/acc_bias" value="0.5"/>
+      <param name="initial_covariance/extrinsic_rotation_cov" value="1e-6"/>
+      <param name="initial_covariance/extrinsic_translation_cov" value="1e-6"/>
 
       <remap from="~imu" to="/mynteye/imu/data_raw"/>
       <remap from="~features" to="image_processor/features"/>
@@ -62,5 +68,7 @@
   <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find msckf_vio)/rviz/rviz_mynteye_config.rviz" />
 
   <include file="$(find mynt_eye_ros_wrapper)/launch/mynteye.launch">
+    <arg name="frame_rate" value="$(arg frame_rate)" />
+    <arg name="imu_frequency" value="$(arg imu_frequency)" />
   </include>
 </launch>

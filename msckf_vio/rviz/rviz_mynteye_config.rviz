@@ -4,7 +4,6 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /TF1/Status1
         - /TF1/Frames1
         - /VIO1/Shape1
         - /Ground Truth1/Shape1
@@ -173,7 +172,7 @@ Visualization Manager:
         Shaft Length: 1
         Shaft Radius: 0.100000001
         Value: Arrow
-      Topic: /my_robot/vio/odom
+      Topic: /jinyaos_vio/vio/odom
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -201,14 +200,14 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 1
       Style: Points
-      Topic: /my_robot/vio/feature_point_cloud
+      Topic: /jinyaos_vio/vio/feature_point_cloud
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /my_robot/image_processor/debug_stereo_image
+      Image Topic: /jinyaos_vio/image_processor/debug_stereo_image
       Max Value: 1
       Median window: 5
       Min Value: 0

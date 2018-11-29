@@ -55,7 +55,7 @@
   <!-- <arg name="contrast" default="127" /> -->
 
   <!-- frame_rate range: {10,15,20,25,30,35,40,45,50,55,60} -->
-  <arg name="frame_rate" default="30" />
+  <arg name="frame_rate" default="25" />
   <!-- <arg name="frame_rate" default="25" /> -->
 
   <!-- imu_frequency range: {100,200,250,333,500} -->
