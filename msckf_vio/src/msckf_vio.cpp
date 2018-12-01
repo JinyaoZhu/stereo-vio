@@ -425,18 +425,18 @@ void MsckfVio::featureCallback(
     ++critical_time_cntr;
     ROS_INFO("\033[1;31mTotal processing time %f/%d...\033[0m",
         processing_time, critical_time_cntr);
-    printf("IMU processing time: %f/%f\n",
-       imu_processing_time, imu_processing_time/processing_time);
-    printf("State augmentation time: %f/%f\n",
-       state_augmentation_time, state_augmentation_time/processing_time);
-    printf("Add observations time: %f/%f\n",
-       add_observations_time, add_observations_time/processing_time);
-    printf("Remove lost features time: %f/%f\n",
-        remove_lost_features_time, remove_lost_features_time/processing_time);
-    printf("Remove camera states time: %f/%f\n",
-        prune_cam_states_time, prune_cam_states_time/processing_time);
-    printf("Publish time: %f/%f\n",
-       publish_time, publish_time/processing_time);
+    printf("IMU processing time: %f/%.1f%%\n",
+       imu_processing_time, 100*imu_processing_time/processing_time);
+    printf("State augmentation time: %f/%.1f%%\n",
+       state_augmentation_time, 100*state_augmentation_time/processing_time);
+    printf("Add observations time: %f/%.1f%%\n",
+       add_observations_time, 100*add_observations_time/processing_time);
+    printf("Remove lost features time: %f/%.1f%%\n",
+        remove_lost_features_time, 100*remove_lost_features_time/processing_time);
+    printf("Remove camera states time: %f/%.1f%%\n",
+        prune_cam_states_time, 100*prune_cam_states_time/processing_time);
+    printf("Publish time: %f/%.1f%%\n",
+       publish_time, 100*publish_time/processing_time);
   }
 
   return;
