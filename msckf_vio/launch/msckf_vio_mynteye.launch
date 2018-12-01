@@ -6,9 +6,9 @@
 
   <!-- VI-Sensor parameters -->
   <!-- frame_rate range: {10,15,20,25,30,35,40,45,50,55,60} -->
-  <arg name="frame_rate" default="20" />
+  <arg name="frame_rate" default="25" />
   <!-- imu_frequency range: {100,200,250,333,500} -->
-  <arg name="imu_frequency" default="250" />
+  <arg name="imu_frequency" default="200" />
 
   <!-- Image Processor Nodelet  -->
   <include file="$(find msckf_vio)/launch/image_processor_mynteye.launch">
@@ -40,10 +40,10 @@
       <param name="feature/config/translation_threshold" value="-1.0"/>
 
       <!-- These values should be standard deviation -->
-      <param name="noise/gyro" value="0.005"/>
-      <param name="noise/acc" value="0.05"/>
-      <param name="noise/gyro_bias" value="0.001"/>
-      <param name="noise/acc_bias" value="0.01"/>
+      <param name="noise/gyro" value="0.00888232829671"/>
+      <param name="noise/acc" value="0.0268014618074 "/>
+      <param name="noise/gyro_bias" value="0.000379565782927"/>
+      <param name="noise/acc_bias" value="0.00262960861593"/>
       <param name="noise/feature" value="0.035"/>
 
       <param name="initial_state/velocity/x" value="0.0"/>
@@ -67,8 +67,4 @@
 
   <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find msckf_vio)/rviz/rviz_mynteye_config.rviz" />
 
-  <include file="$(find mynt_eye_ros_wrapper)/launch/mynteye.launch">
-    <arg name="frame_rate" value="$(arg frame_rate)" />
-    <arg name="imu_frequency" value="$(arg imu_frequency)" />
-  </include>
 </launch>

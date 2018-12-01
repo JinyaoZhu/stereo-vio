@@ -1,0 +1,23 @@
+<launch>
+
+  <arg name="robot" default="jinyaos_vio"/>
+  <arg name="fixed_frame_id" default="world"/>
+  <arg name="calibration_file" default="$(find msckf_vio)/config/camchain-imucam-mynteye.yaml"/>
+
+  <!-- VI-Sensor parameters -->
+  <!-- frame_rate range: {10,15,20,25,30,35,40,45,50,55,60} -->
+  <arg name="frame_rate" value="25" />
+  <!-- imu_frequency range: {100,200,250,333,500} -->
+  <arg name="imu_frequency" value="200" />
+
+
+  <include file="$(find msckf_vio)/launch/msckf_vio_mynteye.launch">
+    <arg name="frame_rate" value="$(arg frame_rate)" />
+    <arg name="imu_frequency" value="$(arg imu_frequency)" />
+  </include>
+
+  <include file="$(find mynt_eye_ros_wrapper)/launch/mynteye.launch">
+    <arg name="frame_rate" value="$(arg frame_rate)" />
+    <arg name="imu_frequency" value="$(arg imu_frequency)" />
+  </include>
+</launch>

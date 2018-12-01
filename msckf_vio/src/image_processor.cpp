@@ -714,8 +714,8 @@ void ImageProcessor::addNewFeatures() {
       const int y = static_cast<int>(feature.cam0_point.y);
       const int x = static_cast<int>(feature.cam0_point.x);
 
-      int up_lim = y-3, bottom_lim = y+3,
-          left_lim = x-3, right_lim = x+3;
+      int up_lim = y-2, bottom_lim = y+2,
+          left_lim = x-2, right_lim = x+2;
       if (up_lim < 0) up_lim = 0;
       if (bottom_lim > curr_img.rows) bottom_lim = curr_img.rows;
       if (left_lim < 0) left_lim = 0;
@@ -840,18 +840,21 @@ void ImageProcessor::addNewFeatures() {
 }
 
 void ImageProcessor::pruneGridFeatures() {
+  int pruned_features_num = 0;
   for (auto& item : *curr_features_ptr) {
     auto& grid_features = item.second;
     // Continue if the number of features in this grid does
     // not exceed the upper bound.
     if (grid_features.size() <=
         processor_config.grid_max_feature_num) continue;
+    pruned_features_num += grid_features.size()-processor_config.grid_max_feature_num;
     std::sort(grid_features.begin(), grid_features.end(),
         &ImageProcessor::featureCompareByLifetime);
     grid_features.erase(grid_features.begin()+
         processor_config.grid_max_feature_num,
         grid_features.end());
   }
+  // printf("pruned features num: %d\n",pruned_features_num);
   return;
 }
 
@@ -1457,7 +1460,17 @@ void ImageProcessor::drawFeaturesStereo() {
   }
   //imshow("Feature", out_img);
   //waitKey(5);
-
+  // vector<Point2f> harris_keypoints;
+  // Mat out_img_harris(cam0_curr_img_ptr->image.rows, cam0_curr_img_ptr->image.cols, CV_8UC3);
+  // cvtColor(cam0_curr_img_ptr->image,
+  //          out_img_harris.colRange(0, cam0_curr_img_ptr->image.cols), CV_GRAY2RGB);
+  // goodFeaturesToTrack(cam0_curr_img_ptr->image, harris_keypoints, 150, 0.01, 30);
+  // for (const auto& new_cam0_point : harris_keypoints) {
+  //     cv::Point2f pt0 = new_cam0_point;
+  //     circle(out_img_harris, pt0, 3, Scalar(0, 255, 255), -1);
+  // }
+  // imshow("Feature", out_img_harris);
+  // waitKey(5);
   return;
 }
 

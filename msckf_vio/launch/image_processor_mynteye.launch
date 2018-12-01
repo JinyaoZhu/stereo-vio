@@ -11,17 +11,17 @@
       output="screen">
 
       <rosparam command="load" file="$(arg calibration_file)"/>
-      <param name="grid_row" value="10"/>
-      <param name="grid_col" value="16"/>
+      <param name="grid_row" value="6"/>
+      <param name="grid_col" value="8"/>
       <param name="grid_min_feature_num" value="1"/>
-      <param name="grid_max_feature_num" value="1"/>
+      <param name="grid_max_feature_num" value="2"/>
       <param name="pyramid_levels" value="5"/>
       <param name="patch_size" value="15"/>
       <param name="fast_threshold" value="10"/>
-      <param name="max_iteration" value="20"/>
+      <param name="max_iteration" value="30"/>
       <param name="track_precision" value="0.01"/>
-      <param name="ransac_threshold" value="5"/>
-      <param name="stereo_threshold" value="5"/>
+      <param name="ransac_threshold" value="3"/>
+      <param name="stereo_threshold" value="3"/>
 
       <remap from="~imu" to="/mynteye/imu/data_raw"/>
       <remap from="~cam0_image" to="/mynteye/left/image_raw"/>
