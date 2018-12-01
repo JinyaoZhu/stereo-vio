@@ -610,6 +610,9 @@ void ImageProcessor::trackFeatures() {
   //    static_cast<double>(curr_feature_num)/
   //    (static_cast<double>(prev_feature_num)+1e-5));
 
+  // showMatchImg(prev_matched_cam0_points, cam0_prev_img_ptr->image, curr_matched_cam0_points,
+  //              cam0_curr_img_ptr->image, cam0_ransac_inliers);
+
   return;
 }
 
@@ -693,7 +696,9 @@ void ImageProcessor::stereoMatch(
     if (error > processor_config.stereo_threshold*norm_pixel_unit)
       inlier_markers[i] = 0;
   }
-
+  
+  // showMatchImg(cam0_points, cam0_curr_img_ptr->image, cam1_points,
+  //              cam1_curr_img_ptr->image, inlier_markers);
   return;
 }
 
@@ -707,15 +712,15 @@ void ImageProcessor::addNewFeatures() {
     cam0_curr_img_ptr->image.cols / processor_config.grid_col;
 
   // Create a mask to avoid redetecting existing features.
-  Mat mask(curr_img.rows, curr_img.cols, CV_8U, Scalar(1));
+  Mat mask(curr_img.rows, curr_img.cols, CV_8U, Scalar(255));
 
   for (const auto& features : *curr_features_ptr) {
     for (const auto& feature : features.second) {
       const int y = static_cast<int>(feature.cam0_point.y);
       const int x = static_cast<int>(feature.cam0_point.x);
 
-      int up_lim = y-2, bottom_lim = y+2,
-          left_lim = x-2, right_lim = x+2;
+      int up_lim = y-15, bottom_lim = y+15,
+          left_lim = x-15, right_lim = x+15;
       if (up_lim < 0) up_lim = 0;
       if (bottom_lim > curr_img.rows) bottom_lim = curr_img.rows;
       if (left_lim < 0) left_lim = 0;
@@ -726,6 +731,9 @@ void ImageProcessor::addNewFeatures() {
       mask(row_range, col_range) = 0;
     }
   }
+
+  // imshow("Mask",mask);
+  // waitKey(0);
 
   // Detect new features.
   vector<KeyPoint> new_features(0);
@@ -1504,6 +1512,29 @@ void ImageProcessor::featureLifetimeStatistics() {
     cout << data.first << " : " << data.second << endl;
 
   return;
+}
+
+// draw match image with matching-line 
+void ImageProcessor::showMatchImg(const std::vector<cv::Point2f> &p1, const cv::Mat &img1,
+                                  const std::vector<cv::Point2f> &p2, const cv::Mat &img2,
+                                  const std::vector<int> inlier_marker)
+{
+  vector<DMatch> match(0);
+  vector<KeyPoint> matched_cam0_points;
+  vector<KeyPoint> matched_cam1_points;
+  int match_num = 0;
+  for (int i = 0; i < p1.size(); i++)
+  {
+    if(inlier_marker[i] == 0) continue;
+    matched_cam0_points.push_back(KeyPoint(p1[i], 0.1));
+    matched_cam1_points.push_back(KeyPoint(p2[i], 0.1));
+    match.push_back(DMatch(match_num, match_num, 1));
+    ++match_num;
+  }
+  Mat img_matches;
+  drawMatches(img1, matched_cam0_points, img2, matched_cam1_points, match, img_matches);
+  imshow("Matches", img_matches);
+  waitKey(0);
 }
 
 } // end namespace msckf_vio
