@@ -318,6 +318,10 @@ private:
     return;
   }
 
+  void showMatchImg(const std::vector<cv::Point2f> &p1, const cv::Mat &img1,
+                    const std::vector<cv::Point2f> &p2, const cv::Mat &img2,
+                    const std::vector<int> inlier_marker);
+
   // Indicate if this is the first image message.
   bool is_first_img;
 
