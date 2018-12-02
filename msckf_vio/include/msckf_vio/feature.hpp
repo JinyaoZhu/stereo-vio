@@ -94,7 +94,7 @@ struct Feature {
    * @brief generateInitialGuess Compute the initial guess of
    *    the feature's 3d position using only two views.
    * @param T_c1_c2: A rigid body transformation taking
-   *    a vector from c2 frame to c1 frame.
+   *    a vector from c1 frame to c2 frame.
    * @param z1: feature observation in c1 frame.
    * @param z2: feature observation in c2 frame.
    * @return p: Computed feature position in c1 frame.
@@ -230,7 +230,7 @@ void Feature::generateInitialGuess(
     const Eigen::Vector2d& z2, Eigen::Vector3d& p) const {
   // Construct a least square problem to solve the depth.
   Eigen::Vector3d m = T_c1_c2.linear() * Eigen::Vector3d(z1(0), z1(1), 1.0);
-
+  // using constraint [R(z1,1)'+t]//(z2,1)' ---> [R(z1,1)'+t]x(z2,1) = 0'
   Eigen::Vector2d A(0.0, 0.0);
   A(0) = m(0) - z2(0)*m(2);
   A(1) = m(1) - z2(1)*m(2);
