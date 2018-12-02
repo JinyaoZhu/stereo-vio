@@ -178,6 +178,7 @@ bool MsckfVio::loadParameters() {
 
 bool MsckfVio::createRosIO() {
   odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 10);
+  path_pub = nh.advertise<nav_msgs::Path>("path", 10);
   feature_pub = nh.advertise<sensor_msgs::PointCloud2>(
       "feature_point_cloud", 10);
 
@@ -1081,6 +1082,7 @@ void MsckfVio::removeLostFeatures() {
         feature.observations.end()) continue;
     if (feature.observations.size() < 3) {
       invalid_feature_ids.push_back(feature.id);
+      // cout << "size false" << endl;
       continue;
     }
 
@@ -1089,10 +1091,12 @@ void MsckfVio::removeLostFeatures() {
     if (!feature.is_initialized) {
       if (!feature.checkMotion(state_server.cam_states)) {
         invalid_feature_ids.push_back(feature.id);
+        // cout << "checkMotion false" << endl;
         continue;
       } else {
         if(!feature.initializePosition(state_server.cam_states)) {
           invalid_feature_ids.push_back(feature.id);
+          // cout << "initializePosition false" << endl;
           continue;
         }
       }
@@ -1102,7 +1106,7 @@ void MsckfVio::removeLostFeatures() {
     processed_feature_ids.push_back(feature.id);
   }
 
-  //cout << "invalid/processed feature #: " <<
+  // cout << "invalid/processed feature #: " <<
   //  invalid_feature_ids.size() << "/" <<
   //  processed_feature_ids.size() << endl;
   //cout << "jacobian row #: " << jacobian_row_size << endl;
@@ -1464,6 +1468,19 @@ void MsckfVio::publish(const ros::Time& time) {
 
   feature_pub.publish(feature_msg_ptr);
 
+  // publish path messages
+  static nav_msgs::Path path_msg;
+  if (path_pub.getNumSubscribers() > 0)
+  {
+    path_msg.header.stamp = time;
+    path_msg.header.frame_id = fixed_frame_id;
+    geometry_msgs::PoseStamped pose_msg;
+    pose_msg.header.stamp = time;
+    pose_msg.header.frame_id = fixed_frame_id;
+    pose_msg.pose = odom_msg.pose.pose;
+    path_msg.poses.push_back(pose_msg);
+    path_pub.publish(path_msg);
+  }
   return;
 }
 

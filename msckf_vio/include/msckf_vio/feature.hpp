@@ -284,6 +284,8 @@ bool Feature::checkMotion(
   Eigen::Vector3d orthogonal_translation = translation -
     parallel_translation*feature_direction;
 
+  // std::cout<< "orthogonal_translation norm:"<< orthogonal_translation.norm() << std::endl;
+
   if (orthogonal_translation.norm() >
       optimization_config.translation_threshold)
     return true;
