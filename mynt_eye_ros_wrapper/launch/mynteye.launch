@@ -59,7 +59,7 @@
   <!-- <arg name="frame_rate" default="25" /> -->
 
   <!-- imu_frequency range: {100,200,250,333,500} -->
-  <arg name="imu_frequency" default="333" />
+  <arg name="imu_frequency" default="200" />
   <!-- <arg name="imu_frequency" default="200" /> -->
 
   <!-- exposure_mode, 0: auto-exposure, 1: manual-exposure -->

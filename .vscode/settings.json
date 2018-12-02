@@ -24,7 +24,8 @@
         "system_error": "cpp",
         "thread": "cpp",
         "cinttypes": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "iostream": "cpp"
     },
     "python.autoComplete.extraPaths": [
         "/home/jinyao/ros_ws/stereo-vio/devel/lib/python2.7/dist-packages",

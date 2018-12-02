@@ -719,8 +719,8 @@ void ImageProcessor::addNewFeatures() {
       const int y = static_cast<int>(feature.cam0_point.y);
       const int x = static_cast<int>(feature.cam0_point.x);
 
-      int up_lim = y-15, bottom_lim = y+15,
-          left_lim = x-15, right_lim = x+15;
+      int up_lim = y-5, bottom_lim = y+5,
+          left_lim = x-5, right_lim = x+5;
       if (up_lim < 0) up_lim = 0;
       if (bottom_lim > curr_img.rows) bottom_lim = curr_img.rows;
       if (left_lim < 0) left_lim = 0;
