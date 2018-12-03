@@ -42,11 +42,13 @@ add_message_files(
   FeatureMeasurement.msg
   CameraMeasurement.msg
   TrackingInfo.msg
+  ImuState.msg
 )
 
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 ###################################

@@ -27,6 +27,8 @@
 #include <msckf_vio/math_utils.hpp>
 #include <msckf_vio/utils.h>
 
+#include <msckf_vio/ImuState.h>
+
 using namespace std;
 using namespace Eigen;
 
@@ -179,6 +181,7 @@ bool MsckfVio::loadParameters() {
 bool MsckfVio::createRosIO() {
   odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 10);
   path_pub = nh.advertise<nav_msgs::Path>("path", 10);
+  imu_state_pub = nh.advertise<ImuState>("imu_state", 10);
   feature_pub = nh.advertise<sensor_msgs::PointCloud2>(
       "feature_point_cloud", 10);
 
@@ -417,10 +420,12 @@ void MsckfVio::featureCallback(
   onlineReset();
 
   double processing_end_time = ros::Time::now().toSec();
-  double processing_time =
-    processing_end_time - processing_start_time;
 
-  ROS_INFO_THROTTLE(0.5,"MSCKF-Processing time:%.2f[ms]",processing_time*1000);
+  // compute avg. processing time
+  static double processing_time = 0;
+  processing_time = 0.99*processing_time + 0.01*(processing_end_time - processing_start_time);
+
+  ROS_INFO_THROTTLE(0.5,"MSCKF-Processing avg. time:%.2f[ms]",processing_time*1000);
   
   if (processing_time > 1.0/frame_rate) {
     ++critical_time_cntr;
@@ -1399,6 +1404,9 @@ void MsckfVio::publish(const ros::Time& time) {
       imu_state.orientation).transpose();
   T_i_w.translation() = imu_state.position;
 
+  // Here the w in T_b_w and T_i_w mean different world frame
+  // (body frame to imu frame) => (imu frame to imu_inital frame) 
+  // => (imu_inital frame to body_initial frame)
   Eigen::Isometry3d T_b_w = IMUState::T_imu_body * T_i_w *
     IMUState::T_imu_body.inverse();
   Eigen::Vector3d body_velocity =
@@ -1418,6 +1426,7 @@ void MsckfVio::publish(const ros::Time& time) {
   odom_msg.header.frame_id = fixed_frame_id;
   odom_msg.child_frame_id = child_frame_id;
 
+  // Pose of body frame w.r.t. body world(body initial) frame
   tf::poseEigenToMsg(T_b_w, odom_msg.pose.pose);
   tf::vectorEigenToMsg(body_velocity, odom_msg.twist.twist.linear);
 
@@ -1451,27 +1460,29 @@ void MsckfVio::publish(const ros::Time& time) {
 
   // Publish the 3D positions of the features that
   // has been initialized.
-  pcl::PointCloud<pcl::PointXYZ>::Ptr feature_msg_ptr(
-      new pcl::PointCloud<pcl::PointXYZ>());
-  feature_msg_ptr->header.frame_id = fixed_frame_id;
-  feature_msg_ptr->height = 1;
-  for (const auto& item : map_server) {
-    const auto& feature = item.second;
-    if (feature.is_initialized) {
-      Vector3d feature_position =
-        IMUState::T_imu_body.linear() * feature.position;
-      feature_msg_ptr->points.push_back(pcl::PointXYZ(
-            feature_position(0), feature_position(1), feature_position(2)));
+  if(feature_pub.getNumSubscribers() > 0){
+    pcl::PointCloud<pcl::PointXYZ>::Ptr feature_msg_ptr(
+        new pcl::PointCloud<pcl::PointXYZ>());
+    feature_msg_ptr->header.frame_id = fixed_frame_id;
+    feature_msg_ptr->height = 1;
+    for (const auto& item : map_server) {
+      const auto& feature = item.second;
+      if (feature.is_initialized) {
+        // transform the feature from imu world to body world
+        Vector3d feature_position =
+          IMUState::T_imu_body.linear() * feature.position;
+        feature_msg_ptr->points.push_back(pcl::PointXYZ(
+              feature_position(0), feature_position(1), feature_position(2)));
+      }
     }
+    feature_msg_ptr->width = feature_msg_ptr->points.size();
+
+    feature_pub.publish(feature_msg_ptr);
   }
-  feature_msg_ptr->width = feature_msg_ptr->points.size();
 
-  feature_pub.publish(feature_msg_ptr);
-
-  // publish path messages
+  // Publish path messages
   static nav_msgs::Path path_msg;
-  if (path_pub.getNumSubscribers() > 0)
-  {
+  if (path_pub.getNumSubscribers() > 0){
     path_msg.header.stamp = time;
     path_msg.header.frame_id = fixed_frame_id;
     geometry_msgs::PoseStamped pose_msg;
@@ -1481,6 +1492,19 @@ void MsckfVio::publish(const ros::Time& time) {
     path_msg.poses.push_back(pose_msg);
     path_pub.publish(path_msg);
   }
+
+  // Publish imu state
+  if(imu_state_pub.getNumSubscribers() > 0){
+    ImuState imu_state_msg;
+    imu_state_msg.header.stamp = time;
+    imu_state_msg.header.frame_id = fixed_frame_id;
+    imu_state_msg.pose = odom_msg.pose.pose;
+    imu_state_msg.velocity = odom_msg.twist.twist.linear;
+    tf::vectorEigenToMsg(imu_state.gyro_bias, imu_state_msg.gyro_bias);
+    tf::vectorEigenToMsg(imu_state.acc_bias, imu_state_msg.acc_bias);
+    imu_state_pub.publish(imu_state_msg);
+  }
+
   return;
 }
 
